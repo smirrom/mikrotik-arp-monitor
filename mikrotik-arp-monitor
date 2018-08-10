@@ -1,0 +1,41 @@
+{
+:global macknown do={
+    :put ("mac ".$mac);
+    :local found 0;
+    :local knownmacs [/file get knownmacs.txt contents];
+    :set found [ :find  $knownmacs $mac -1 ];
+    :if ($found >= 0) do={ :set found 1 } else={ :set found 0 };
+    return $found;
+}
+
+:global addknownmacs do={
+    :local knownmacs [/file get knownmacs.txt contents];
+    :set $knownmacs [:put ($knownmacs." ".$newmac)];
+    /file set knownmacs.txt contents=$knownmacs;
+    :put ("Added MAC ".$newmac);
+}
+
+:global getvendor do={
+# Uncomment for get vendor info (disabled due to unreliable behavior of fetch command: errors due fetching stops whole script)
+#/tool fetch url=("https://macvendors.co/api/".$mac) mode=https ascii=yes keep-result=yes dst-path=macvendor.txt
+#return [ :file get macvendor.txt contents ]
+return "disabled";
+}
+
+:global alert do={
+    :local email "<set-email-here>";
+    :put ("ALERT: ".$message);
+    /tool e-mail send to=$email subject=([/system identity get name]." - ".$msgsubject." (".[/system clock get date]." ".[/system clock get time].")") body=$message;
+    :log info ("[macwatch] New MAC. ".$message);
+}
+
+/ip arp;
+:foreach i in=[find] do={
+    :local macaddr 
+    :set macaddr [ get $i mac-address ];
+    :local clientip
+    :set clientip [get $i address];
+    :set $result [$macknown mac=$macaddr]
+    :if ($result = 0) do={ $alert msgsubject=("New MAC address ".$macaddr) message=("MAC: ".$macaddr.", IP: ".$clientip.", vendor: ".[ $getvendor mac=$macaddr ]); $addknownmacs newmac=$macaddr}
+    }
+}
