@@ -7,6 +7,8 @@ Before using script need to create empty knownmacs.txt file by using theese comm
 
 > /file set knownmacs.txt contents=""
 
-For periodic check need to create scheduler task:
+In script code change <set-email-here> to your e-mail.
+
+For periodic check create scheduler task:
 
 > /system scheduler add interval=1m name=macwatch on-event="/system script run mikrotik-arp-monitor"
