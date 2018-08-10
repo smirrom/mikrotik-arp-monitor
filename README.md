@@ -7,7 +7,7 @@ Before using script need to create empty knownmacs.txt file by using theese comm
 
 > /file set knownmacs.txt contents=""
 
-In script code change <set-email-here> to your e-mail.
+In script code change <<set-email-here>> to your e-mail.
 
 For periodic check create scheduler task:
 
